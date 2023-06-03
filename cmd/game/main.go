@@ -16,10 +16,12 @@ type Game struct {
 	winHeight int32
 	targetFPS int32
 	renderFPS bool
+	zoom      float32
 
 	keymap oberon.Keymap
 
 	player oberon.Player
+	cam    rl.Camera2D
 }
 
 func (g *Game) Init() {
@@ -27,11 +29,19 @@ func (g *Game) Init() {
 	rl.SetExitKey(0)
 	rl.SetTargetFPS(g.targetFPS)
 
+	g.zoom = 1.0
+
 	// TODO load keymaps
 	g.keymap.Init()
 
 	g.player = oberon.Player{}
 	g.player.Init(50, 50, 48, 48, "assets/chara_hero.png")
+
+	g.cam = rl.NewCamera2D(
+		rl.NewVector2(float32(g.winWidth/2), float32(g.winHeight/2)),
+		rl.NewVector2(g.player.GetCameraBounds()),
+		0.0,
+		g.zoom)
 }
 
 // Input handles translating player input to game actions
@@ -52,12 +62,15 @@ func (g *Game) Input() {
 	}
 }
 
-func (g *Game) Update() {}
+func (g *Game) Update() {
+	// Update camera location
+	g.cam.Target = rl.NewVector2(g.player.GetCameraBounds())
+}
 
 func (g *Game) Draw() {
 	rl.BeginDrawing()
-
 	rl.ClearBackground(bg)
+	rl.BeginMode2D(g.cam)
 
 	// TODO dir
 	g.player.Draw()
@@ -66,6 +79,7 @@ func (g *Game) Draw() {
 		rl.DrawFPS(5, 5)
 	}
 
+	rl.EndMode2D()
 	rl.EndDrawing()
 }
 

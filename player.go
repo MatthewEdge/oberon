@@ -46,6 +46,13 @@ func (p *Player) Move(dir int32) {
 	}
 }
 
+// GetCameraBounds returns the X/Y boundaries for the Player
+func (p *Player) GetCameraBounds() (cx, cy float32) {
+	cx = p.dest.X - (p.dest.Width / 2)
+	cy = p.dest.Y - (p.dest.Height / 2)
+	return cx, cy
+}
+
 // Draw draws the player
 func (p *Player) Draw() {
 	rl.DrawTexturePro(p.sprite, p.src, p.dest, rl.NewVector2(p.dest.Width, p.dest.Height), 0, rl.White)
