@@ -17,6 +17,7 @@ type Game struct {
 	targetFPS int32
 	renderFPS bool
 	zoom      float32
+	paused    bool
 
 	keymap oberon.Keymap
 
@@ -25,6 +26,7 @@ type Game struct {
 }
 
 func (g *Game) Init() {
+	// Must init Textures and Sounds AFTER Window/Audio init
 	rl.InitWindow(g.winWidth, g.winHeight, "Oberon")
 	rl.SetExitKey(0)
 	rl.SetTargetFPS(g.targetFPS)
@@ -44,25 +46,22 @@ func (g *Game) Init() {
 		g.zoom)
 }
 
-// Input handles translating player input to game actions
-func (g *Game) Input() {
+func (g *Game) Update() {
 	// TODO the level should handle out-of-bounds
 	// TODO but who handles collisions?
-	if rl.IsKeyDown((g.keymap.Up)) {
+	if rl.IsKeyDown(g.keymap.Up) {
 		g.player.Move(oberon.DirUp)
 	}
-	if rl.IsKeyDown((g.keymap.Down)) {
+	if rl.IsKeyDown(g.keymap.Down) {
 		g.player.Move(oberon.DirDown)
 	}
-	if rl.IsKeyDown((g.keymap.Left)) {
+	if rl.IsKeyDown(g.keymap.Left) {
 		g.player.Move(oberon.DirLeft)
 	}
-	if rl.IsKeyDown((g.keymap.Right)) {
+	if rl.IsKeyDown(g.keymap.Right) {
 		g.player.Move(oberon.DirRight)
 	}
-}
 
-func (g *Game) Update() {
 	// Update camera location
 	g.cam.Target = rl.NewVector2(g.player.GetCameraBounds())
 }
@@ -72,9 +71,10 @@ func (g *Game) Draw() {
 	rl.ClearBackground(bg)
 	rl.BeginMode2D(g.cam)
 
-	// TODO dir
+	// TODO swap to Map.Draw()
 	g.player.Draw()
 
+	// TODO move to top of player view
 	if g.renderFPS {
 		rl.DrawFPS(5, 5)
 	}
@@ -104,7 +104,6 @@ func main() {
 	defer g.Close()
 
 	for g.ShouldClose() {
-		g.Input()
 		g.Update()
 		g.Draw()
 	}

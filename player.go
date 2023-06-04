@@ -5,20 +5,22 @@ import (
 )
 
 type Player struct {
-	speed  float32
-	width  float32
-	height float32
-	src    rl.Rectangle // Source on canvas
-	dest   rl.Rectangle // Destination on canvas
-	sprite rl.Texture2D
+	speed    float32
+	width    float32
+	height   float32
+	position rl.Vector2
+	src      rl.Rectangle // Source on canvas
+	dest     rl.Rectangle // Destination on canvas
+	sprite   rl.Texture2D
 }
 
 func (p *Player) Init(x, y, width, height float32, texFile string) {
+	p.sprite = rl.LoadTexture(texFile)
 	p.width = width
 	p.height = height
-	p.speed = 3 // TODO
-	p.sprite = rl.LoadTexture(texFile)
+	p.speed = 1 // 0 - 1
 
+	// TODO can these be replaced with a Vector2 position?
 	p.src = rl.NewRectangle(0, 0, p.width, p.height)
 	p.dest = rl.NewRectangle(x, y, p.width, p.height)
 }
