@@ -10,6 +10,7 @@ type Keymap struct {
 	Left  int32
 	Right int32
 	Pause int32
+	Exit  int32
 }
 
 // TODO defaults
@@ -18,5 +19,6 @@ func (k *Keymap) Init() {
 	k.Down = rl.KeyS
 	k.Left = rl.KeyA
 	k.Right = rl.KeyD
-	k.Pause = rl.KeyEscape
+	k.Pause = rl.KeyP
+	k.Exit = rl.KeyEscape
 }

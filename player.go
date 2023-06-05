@@ -1,6 +1,8 @@
 package oberon
 
 import (
+	"fmt"
+
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
@@ -35,15 +37,19 @@ const (
 // Move sets the player to move in the given direction
 func (p *Player) Move(dir int32) {
 	if dir == DirUp {
+		p.position.Y -= p.speed
 		p.dest.Y -= p.speed
 	}
 	if dir == DirDown {
+		p.position.Y += p.speed
 		p.dest.Y += p.speed
 	}
 	if dir == DirLeft {
+		p.position.X -= p.speed
 		p.dest.X -= p.speed
 	}
 	if dir == DirRight {
+		p.position.X += p.speed
 		p.dest.X += p.speed
 	}
 }
@@ -57,6 +63,8 @@ func (p *Player) GetCameraBounds() (cx, cy float32) {
 
 // Draw draws the player
 func (p *Player) Draw() {
+	posStr := fmt.Sprintf("%f.2, %f.2", p.position.X, p.position.Y)
+	rl.DrawText(posStr, int32(p.position.X), int32(p.position.Y-20), 14, rl.White)
 	rl.DrawTexturePro(p.sprite, p.src, p.dest, rl.NewVector2(p.dest.Width, p.dest.Height), 0, rl.White)
 }
 

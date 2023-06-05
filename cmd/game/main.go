@@ -12,12 +12,12 @@ var (
 )
 
 type Game struct {
-	winWidth  int32
-	winHeight int32
-	targetFPS int32
-	renderFPS bool
-	zoom      float32
-	paused    bool
+	winWidth      int32
+	winHeight     int32
+	targetFPS     int32
+	renderFPS     bool
+	zoom          float32
+	cameraEnabled bool
 
 	keymap oberon.Keymap
 
@@ -28,7 +28,9 @@ type Game struct {
 func (g *Game) Init() {
 	// Must init Textures and Sounds AFTER Window/Audio init
 	rl.InitWindow(g.winWidth, g.winHeight, "Oberon")
-	rl.SetExitKey(0)
+	// rl.SetExitKey(0) // TODO re-enable to remap exit key
+
+	// rl.SetConfigFlags(rl.FlagVsyncHint)
 	rl.SetTargetFPS(g.targetFPS)
 
 	g.zoom = 1.0
@@ -40,7 +42,7 @@ func (g *Game) Init() {
 	g.player.Init(50, 50, 48, 48, "assets/chara_hero.png")
 
 	g.cam = rl.NewCamera2D(
-		rl.NewVector2(float32(g.winWidth/2), float32(g.winHeight/2)),
+		rl.NewVector2(float32(g.winWidth/2), float32(g.winHeight/2)), // Center screen
 		rl.NewVector2(g.player.GetCameraBounds()),
 		0.0,
 		g.zoom)
@@ -69,7 +71,10 @@ func (g *Game) Update() {
 func (g *Game) Draw() {
 	rl.BeginDrawing()
 	rl.ClearBackground(bg)
-	rl.BeginMode2D(g.cam)
+
+	if g.cameraEnabled {
+		rl.BeginMode2D(g.cam)
+	}
 
 	// TODO swap to Map.Draw()
 	g.player.Draw()
@@ -79,7 +84,10 @@ func (g *Game) Draw() {
 		rl.DrawFPS(5, 5)
 	}
 
-	rl.EndMode2D()
+	if g.cameraEnabled {
+		rl.EndMode2D()
+	}
+
 	rl.EndDrawing()
 }
 
@@ -95,15 +103,17 @@ func (g *Game) Close() {
 
 func main() {
 	g := Game{
-		winWidth:  640,
-		winHeight: 480,
-		targetFPS: 60,
-		renderFPS: true,
+		winWidth:      640,
+		winHeight:     480,
+		targetFPS:     60,
+		renderFPS:     true,
+		cameraEnabled: false,
 	}
 	g.Init()
 	defer g.Close()
 
 	for g.ShouldClose() {
+		// Update first so that we can prepare what is actually drawn
 		g.Update()
 		g.Draw()
 	}
